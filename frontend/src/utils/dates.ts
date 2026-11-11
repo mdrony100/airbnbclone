@@ -52,3 +52,17 @@ export function monthMatrix(year: number, month: number): (string | null)[][] {
   for (let i = 0; i < cells.length; i += 7) rows.push(cells.slice(i, i + 7))
   return rows
 }
+
+/** Whole days between two ISO dates (b - a). Negative when b is before a. */
+export function daysBetween(a: string, b: string): number {
+  const start = new Date(`${a}T00:00:00`).getTime()
+  const end = new Date(`${b}T00:00:00`).getTime()
+  return Math.round((end - start) / 86400000)
+}
+
+/** ISO date for the Monday of the week containing `iso`. */
+export function startOfWeek(iso: string): string {
+  const d = new Date(`${iso}T00:00:00`)
+  const day = d.getDay()
+  return addDays(iso, day === 0 ? -6 : 1 - day)
+}

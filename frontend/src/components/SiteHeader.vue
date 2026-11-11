@@ -86,7 +86,10 @@ const isActive = (path: string): boolean => route.path === path
                   <p class="text-sm font-semibold">{{ auth.user.name }}</p>
                   <p class="truncate text-xs text-muted">{{ auth.user.email }}</p>
                 </div>
-                <RouterLink to="/wishlist" class="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-sand" @click="accountOpen = false">
+                <RouterLink to="/dashboard" class="flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium hover:bg-sand" @click="accountOpen = false">
+                  <AppIcon name="compass" :size="16" /> Dashboard
+                </RouterLink>
+                <RouterLink to="/dashboard/wishlists" class="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-sand" @click="accountOpen = false">
                   <AppIcon name="heart" :size="16" /> Wishlist ({{ wishlist.count }})
                 </RouterLink>
                 <button class="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm hover:bg-sand" @click="goToBookings">

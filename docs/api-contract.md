@@ -80,6 +80,43 @@ Laravel Sanctum tokens, email verification by signed link, password reset by sig
 `GET /api/wishlist`, `POST /api/wishlist/{slug}`, `DELETE /api/wishlist/{slug}`. Until a
 user is signed in, the frontend keeps these locally.
 
+## Dashboard (milestone 2)
+
+Every dashboard read is scoped by `Authorization: Bearer <sanctum token>`; the API must
+resolve the account from the token and never trust an `accountId` in the body. Guests and
+hosts are the same `accounts` row: `mode` is `traveling` or `hosting` and is a preference,
+not a permission. Hosting endpoints require `hosts.status = approved`.
+
+| Method | Path | Notes |
+| --- | --- | --- |
+| `GET` | `/api/dashboard` | One payload: account, listings owned, reservations for both sides, conversations, reviews, payouts, notifications, tickets |
+| `PATCH` | `/api/accounts/{id}` | Profile, notification prefs, HTML-safe `about`; `mode` also settable here |
+| `POST` | `/api/accounts/{id}/host-application` | Creates or resubmits `hosts` profile, sets `status = pending` |
+
+Listings (host only): `POST /api/listings`, `PATCH /api/listings/{id}`,
+`POST /api/listings/{id}/status` with `draft | pending | paused | published`,
+`PUT /api/listings/{id}/blocked-dates` with `{ "dates": ["YYYY-MM-DD"] }`.
+
+`POST /api/listings/{id}/status` is the only path to `published`; approval is an admin
+action, so a host client must never be able to set `published` directly.
+
+Reservations: `GET /api/reservations/{code}`,
+`POST /api/reservations/{code}/cancel`, `POST /api/reservations/{code}/review`,
+`POST /api/reviews/{id}/reply`, `POST /api/reviews/{id}/respond-as-guest`.
+
+`cancel` returns the computed `refund` and `kept` amounts from the policy snapshotted on
+the reservation at booking time, never from the property's current policy.
+
+Messaging: `GET /api/conversations`, `GET /api/conversations/{id}`,
+`POST /api/conversations/{id}/messages`. A conversation is visible only to its `guest_id`
+and `host_id`; read receipts are per side (`read_by_guest`, `read_by_host`).
+
+Payouts and earnings: `GET /api/payouts` (host only). Earnings figures are derived from
+reservations, not stored twice: `gross = nightly + cleaning`, `platform_fee`, `net`.
+
+Support: `POST /api/tickets`. Host identity verification and Stripe Connect onboarding are
+out of scope for this prototype and must not be faked as connected in a real build.
+
 ## Errors
 
 `422` for validation with `{ "message": "", "errors": { "field": ["..."] } }`, `404` for
